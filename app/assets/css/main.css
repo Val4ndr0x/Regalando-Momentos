@@ -1,0 +1,236 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------
+   Regalando Momentos — design tokens
+   Palette: blush + deep plum ink + one raspberry accent.
+   Deliberately not the beige/brass/oxblood "premium artisan" default.
+   Corner-radius lock: 20px soft cards, full-pill interactive controls.
+
+   Exposed to Tailwind utilities via the v4 `bg-(--token)` / `text-(--token)`
+   arbitrary-var syntax (e.g. `bg-(--accent)`, `rounded-(--radius-card)`),
+   so components read design values straight from these custom properties
+   instead of duplicating hex/px literals in class strings.
+----------------------------------------------------------------- */
+:root {
+  --bg: #fdf6f8;
+  --bg-alt: #fbecef;
+  --surface: #ffffff;
+  --ink: #1d1620;
+  --ink-soft: #6d5f6f;
+  --ink-faint: #a698a3;
+  --line: rgba(29, 22, 32, 0.1);
+  --line-strong: rgba(29, 22, 32, 0.16);
+
+  --accent: #c1275a;
+  --accent-dark: #98123f;
+  --accent-tint: #fbe1e8;
+  --accent-tint-strong: #f6c3d2;
+  --on-accent: #fff6f8;
+
+  --container: 1320px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Feeds the tokens above into Tailwind's theme namespaces so components can use
+   idiomatic utilities (bg-ink, text-accent, rounded-card, font-display, shadow-soft)
+   instead of raw hex/px literals. Colors alias the --color-* namespace back to the
+   short --ink/--accent/etc. names via var() (both stay usable). Radius/shadow/font
+   share Tailwind's own --radius-* / --shadow-* / --font-* namespace names, so they're
+   defined directly here — this IS their single source of truth, and var(--radius-card)
+   etc. still resolves anywhere else in the app since @theme emits real CSS variables. */
+@theme {
+  --color-bg: var(--bg);
+  --color-bg-alt: var(--bg-alt);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-accent: var(--accent);
+  --color-accent-dark: var(--accent-dark);
+  --color-accent-tint: var(--accent-tint);
+  --color-accent-tint-strong: var(--accent-tint-strong);
+  --color-on-accent: var(--on-accent);
+
+  --radius-card: 20px;
+  --radius-input: 12px;
+  --radius-pill: 999px;
+
+  --shadow-soft: 0 20px 45px -25px rgba(29, 22, 32, 0.35);
+  --shadow-lift: 0 30px 60px -20px rgba(193, 39, 90, 0.28);
+
+  --font-display: 'Sora', 'Segoe UI', sans-serif;
+  --font-body: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+}
+
+/* Base element resets and the .container / .btn / .eyebrow / .reveal primitives live in
+   Tailwind's `base` / `components` layers (instead of unlayered plain CSS) so that
+   component-level Tailwind utilities — which Tailwind puts in `@layer utilities` —
+   still win the cascade when combined on the same element (e.g. `class="btn ... px-5.5"`
+   overriding .btn's own padding). Unlayered CSS always beats layered CSS regardless of
+   source order, so leaving these unlayered would silently defeat utility overrides. */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    margin: 0;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img {
+    max-width: 100%;
+    display: block;
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .container {
+    width: 100%;
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-inline: clamp(20px, 5vw, 48px);
+  }
+
+  .eyebrow {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border-radius: var(--radius-pill);
+    padding: 15px 28px;
+    font-weight: 600;
+    font-size: 15px;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    transition: transform 0.25s var(--ease-out), background-color 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+  }
+
+  .btn:active {
+    transform: scale(0.98);
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--on-accent);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-dark);
+    transform: translateY(-2px);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--line-strong);
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--ink);
+    transform: translateY(-2px);
+  }
+
+  .btn-on-dark {
+    background: rgba(253, 246, 248, 0.94);
+    color: var(--ink);
+  }
+
+  .btn-on-dark:hover {
+    background: #fff;
+  }
+
+  /* scroll-reveal primitive, paired with the v-reveal directive (app/plugins/reveal.ts) */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
