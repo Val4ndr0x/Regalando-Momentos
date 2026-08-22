@@ -1,5 +1,6 @@
 <template>
   <div id="top">
+    <SplashLoader />
     <NuxtRouteAnnouncer />
     <SiteHeader />
     <main>

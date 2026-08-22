@@ -5,7 +5,7 @@ const steps = [
   {
     icon: PhGift,
     title: 'Eliges tu regalo',
-    body: 'Buscas por ocasión: desayuno, flores, cumpleaños o un kit armado a tu medida.',
+    body: 'Buscas por ocasión: desayuno, flores, cumpleaños o una bandeja para compartir.',
   },
   {
     icon: PhNotePencil,

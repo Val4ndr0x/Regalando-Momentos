@@ -59,7 +59,7 @@ const props = withDefaults(
       <path d="M182 252c-6-24 32-24 26 0" stroke="#f4a13a" stroke-width="8" fill="none" />
     </g>
 
-    <!-- Kits Especiales: caja kit entreabierta -->
+    <!-- Bandejas de Sabores: caja kit entreabierta -->
     <g v-else filter="url(#softshadow)">
       <rect x="96" y="196" width="208" height="150" rx="18" fill="#eaf3ea" />
       <path d="M96 214 200 170 304 214 200 258Z" fill="#a9cdb3" />

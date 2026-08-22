@@ -22,7 +22,7 @@ const stories = [
   },
   {
     tag: 'Puebla',
-    title: 'Un kit de spa para la amiga que nunca pide nada',
+    title: 'Una bandeja dulce para la amiga que nunca pide nada',
     excerpt: 'A veces el regalo más difícil es para quien siempre cuida a los demás primero.',
     image: 'https://picsum.photos/seed/regalando-momentos-spa/500/400',
   },

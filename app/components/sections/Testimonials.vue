@@ -21,7 +21,7 @@ const testimonials = [
     place: 'Monterrey',
     avatar: 'https://i.pravatar.cc/120?img=32',
     quote:
-      'El kit de spa fue el regalo perfecto para mi hermana después de un mes pesado. Todo llegó bien empacado.',
+      'La bandeja de dulces fue el regalo perfecto para mi hermana después de un mes pesado. Todo llegó bien empacado.',
   },
   {
     name: 'Andrés Miramontes',
@@ -33,7 +33,7 @@ const testimonials = [
     name: 'Paola Rincón',
     place: 'Querétaro',
     avatar: 'https://i.pravatar.cc/120?img=25',
-    quote: 'El kit de cumpleaños trajo más de lo que esperaba. Mi hijo no dejó de hablar de los globos en días.',
+    quote: 'La caja de cumpleaños trajo más de lo que esperaba. Mi hijo no dejó de hablar de los globos en días.',
   },
 ]
 

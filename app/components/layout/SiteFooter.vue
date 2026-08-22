@@ -11,7 +11,7 @@ const columns = [
       { label: 'Desayunos Sorpresa', href: '#catalogo' },
       { label: 'Regalos Románticos', href: '#catalogo' },
       { label: 'Cumpleaños', href: '#catalogo' },
-      { label: 'Kits Especiales', href: '#catalogo' },
+      { label: 'Bandejas de Sabores', href: '#catalogo' },
     ],
   },
   {

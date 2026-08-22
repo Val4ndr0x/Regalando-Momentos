@@ -7,7 +7,7 @@ const options = [
   { label: 'Para alguien que amas', categoryId: 'romanticos' },
   { label: 'Para celebrar un cumpleaños', categoryId: 'cumpleanos' },
   { label: 'Para despertarlo con algo rico', categoryId: 'desayunos' },
-  { label: 'Para quien es difícil de sorprender', categoryId: 'kits' },
+  { label: 'Para picar y compartir sin ocasión especial', categoryId: 'kits' },
 ]
 
 const selectedCategory = useSelectedCategory()
