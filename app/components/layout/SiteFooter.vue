@@ -1,106 +1,106 @@
 <script setup lang="ts">
-import { PhWhatsappLogo, PhInstagramLogo, PhFacebookLogo, PhTiktokLogo, PhEnvelopeSimple, PhMapPin } from '@phosphor-icons/vue'
-import { SITE, waLink } from '~/data/site'
+import { PhEnvelopeSimple } from '@phosphor-icons/vue'
+import logoWithCircle from '~/assets/iconos/logowithcircle.png'
 
 const year = new Date().getFullYear()
+const email = ref('')
 
 const columns = [
   {
-    title: 'Regalar',
+    title: '',
     links: [
-      { label: 'Desayunos Sorpresa', href: '#catalogo' },
-      { label: 'Regalos Románticos', href: '#catalogo' },
-      { label: 'Cumpleaños', href: '#catalogo' },
-      { label: 'Bandejas de Sabores', href: '#catalogo' },
+      { label: 'Inicio', href: '#top' },
+      { label: 'Colecciones', href: '#catalogo' },
+      { label: 'Detalles para ella', href: '#catalogo' },
+      { label: 'Detalles para él', href: '#catalogo' },
+      { label: 'Momentos especiales', href: '#catalogo' },
+      { label: 'Eventos & celebraciones', href: '#catalogo' },
     ],
   },
   {
-    title: 'Regalando Momentos',
+    title: '',
     links: [
-      { label: 'Cómo funciona', href: '#como-funciona' },
-      { label: 'Historias', href: '#historias' },
-      { label: 'Entregas recurrentes', href: '#suscripcion' },
-    ],
-  },
-  {
-    title: 'Políticas',
-    links: [
-      { label: 'Términos y condiciones', href: '#' },
-      { label: 'Política de privacidad', href: '#' },
-      { label: 'Política de envíos', href: '#' },
-      { label: 'Cambios y cancelaciones', href: '#' },
+      { label: 'Sobre nosotros', href: '#como-funciona' },
+      { label: 'Cómo comprar', href: '#como-funciona' },
+      { label: 'Envíos y entregas', href: '#' },
+      { label: 'Personalización', href: '#' },
     ],
   },
 ]
+
+function subscribe() {
+  email.value = ''
+}
 </script>
 
 <template>
-  <footer class="bg-(--surface) border-t border-(--line) pt-[clamp(48px,7vw,80px)]">
-    <div class="container grid grid-cols-[1.6fr_1fr_1fr_1fr] gap-10 pb-12 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1">
+  <footer class="footer-dark pt-[clamp(48px,7vw,80px)]">
+    <div class="container grid grid-cols-[1.4fr_1fr_1fr] gap-10 pb-12 max-[900px]:grid-cols-1">
       <div>
-        <a href="#top" class="inline-block font-display font-extrabold text-xl mb-3.5">Regalando Momentos</a>
-        <p class="text-(--ink-soft) text-sm leading-relaxed max-w-[32ch] mb-5">Regalos y desayunos sorpresa con entrega a domicilio. Momentos que se sienten, no solo se envían.</p>
-        <div class="flex gap-2.5">
-          <a
-            :href="waLink('Hola, quiero regalar un momento')"
-            target="_blank"
-            rel="noopener"
-            aria-label="WhatsApp"
-            class="w-9.5 h-9.5 rounded-full bg-(--bg-alt) inline-flex items-center justify-center text-(--ink) transition-colors duration-250 ease-[ease] hover:bg-(--accent) hover:text-(--on-accent)"
-          ><PhWhatsappLogo :size="18" weight="fill" /></a>
-          <a
-            :href="SITE.instagram"
-            target="_blank"
-            rel="noopener"
-            aria-label="Instagram"
-            class="w-9.5 h-9.5 rounded-full bg-(--bg-alt) inline-flex items-center justify-center text-(--ink) transition-colors duration-250 ease-[ease] hover:bg-(--accent) hover:text-(--on-accent)"
-          ><PhInstagramLogo :size="18" weight="fill" /></a>
-          <a
-            :href="SITE.facebook"
-            target="_blank"
-            rel="noopener"
-            aria-label="Facebook"
-            class="w-9.5 h-9.5 rounded-full bg-(--bg-alt) inline-flex items-center justify-center text-(--ink) transition-colors duration-250 ease-[ease] hover:bg-(--accent) hover:text-(--on-accent)"
-          ><PhFacebookLogo :size="18" weight="fill" /></a>
-          <a
-            :href="SITE.tiktok"
-            target="_blank"
-            rel="noopener"
-            aria-label="TikTok"
-            class="w-9.5 h-9.5 rounded-full bg-(--bg-alt) inline-flex items-center justify-center text-(--ink) transition-colors duration-250 ease-[ease] hover:bg-(--accent) hover:text-(--on-accent)"
-          ><PhTiktokLogo :size="18" weight="fill" /></a>
-        </div>
+        <a href="#top" class="inline-block mb-6">
+          <img :src="logoWithCircle" alt="Regalando Momentos" class="w-24 h-24 object-contain">
+        </a>
+
+        <h3 class="footer-gold font-display font-bold text-xl mb-3">Recibe detalles con amor</h3>
+        <p class="text-white/60 text-sm leading-relaxed max-w-[38ch] mb-5">
+          Ideas de regalo, promociones exclusivas y sorpresas nuevas cada mes. Directo a tu correo.
+        </p>
+
+        <form class="flex flex-col gap-3 max-w-md" @submit.prevent="subscribe">
+          <label class="relative block">
+            <span class="sr-only">Tu correo electrónico</span>
+            <PhEnvelopeSimple :size="18" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40" />
+            <input
+              v-model="email"
+              type="email"
+              required
+              placeholder="Tu correo electrónico"
+              class="w-full rounded-xl border border-white/15 bg-white/5 py-3 pl-10 pr-3.5 text-sm text-white placeholder:text-white/40 outline-none transition-colors duration-250 ease-[ease] focus:border-(--footer-gold)"
+            >
+          </label>
+          <button
+            type="submit"
+            class="rounded-xl bg-(--footer-gold) py-3 text-sm font-semibold text-[#1d1620] transition-colors duration-250 ease-[ease] hover:bg-(--footer-gold-dark)"
+          >Quiero sorprender</button>
+        </form>
       </div>
 
-      <nav v-for="col in columns" :key="col.title" class="flex flex-col gap-3" :aria-label="col.title">
-        <h3 class="text-[13px] font-bold uppercase tracking-wider text-(--ink-faint) mb-1">{{ col.title }}</h3>
+      <nav v-for="(col, i) in columns" :key="i" class="flex flex-col gap-3 pt-2 max-[900px]:pt-0">
         <a
           v-for="link in col.links"
           :key="link.label"
           :href="link.href"
-          class="text-sm text-(--ink-soft) inline-flex items-center gap-2 transition-colors duration-250 ease-[ease] hover:text-(--accent)"
+          class="text-sm text-white/70 transition-colors duration-250 ease-[ease] hover:text-(--footer-gold)"
         >{{ link.label }}</a>
       </nav>
-
-      <div class="flex flex-col gap-3">
-        <h3 class="text-[13px] font-bold uppercase tracking-wider text-(--ink-faint) mb-1">Contacto</h3>
-        <a
-          :href="`mailto:${SITE.email}`"
-          class="text-sm text-(--ink-soft) inline-flex items-center gap-2 transition-colors duration-250 ease-[ease] hover:text-(--accent)"
-        ><PhEnvelopeSimple :size="16" />{{ SITE.email }}</a>
-        <a
-          :href="waLink('Hola, quiero regalar un momento')"
-          target="_blank"
-          rel="noopener"
-          class="text-sm text-(--ink-soft) inline-flex items-center gap-2 transition-colors duration-250 ease-[ease] hover:text-(--accent)"
-        ><PhWhatsappLogo :size="16" />{{ SITE.phoneDisplay }}</a>
-        <span class="text-sm text-(--ink-soft) inline-flex items-center gap-2"><PhMapPin :size="16" />{{ SITE.city }}</span>
-      </div>
     </div>
 
-    <div class="container flex justify-between flex-wrap gap-2 py-5.5 border-t border-(--line) text-[13px] text-(--ink-faint)">
-      <p>© {{ year }} Regalando Momentos. Todos los derechos reservados.</p>
-      <p>Hecho con cariño para quienes no dejan pasar un buen motivo para regalar.</p>
+    <div class="border-t border-white/10">
+      <div class="container flex justify-between flex-wrap gap-2 py-5.5 text-[13px] text-white/50">
+        <p>© {{ year }} Regalando Momentos. Hecho con amor 🧡<br class="max-[560px]:hidden">
+          para crear recuerdos inolvidables</p>
+        <p class="flex flex-wrap gap-x-6 gap-y-1 items-start">
+          <a href="#" class="transition-colors duration-250 ease-[ease] hover:text-(--footer-gold)">Términos y condiciones</a>
+          <a href="#" class="transition-colors duration-250 ease-[ease] hover:text-(--footer-gold)">Política de privacidad</a>
+          <a href="#" class="transition-colors duration-250 ease-[ease] hover:text-(--footer-gold)">Preguntas frecuentes</a>
+        </p>
+      </div>
     </div>
   </footer>
 </template>
+
+<style scoped>
+/* Este footer es una sección oscura deliberada (no sigue --bg/--surface
+   claros del resto del sitio): imita una tarjeta de presentación de marca,
+   con el dorado del isotipo como único acento. */
+.footer-dark {
+  --footer-gold: #e8c565;
+  --footer-gold-dark: #d9a635;
+  background: #121016;
+  color: #fff;
+}
+
+.footer-gold {
+  color: var(--footer-gold);
+}
+</style>

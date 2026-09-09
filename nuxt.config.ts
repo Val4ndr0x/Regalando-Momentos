@@ -13,12 +13,12 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'es' },
-      title: 'Regalando Momentos — Regalos y desayunos sorpresa a domicilio',
+      title: 'Desayunos Sorpresa a Domicilio Hoy | Regalando Momentos',
       meta: [
         {
           name: 'description',
           content:
-            'Desayunos sorpresa, flores y regalos con entrega a domicilio en el mismo día. Momentos que se sienten, no solo se envían.',
+            'Sorprende con desayunos sorpresa, flores y regalos personalizados, con entrega a domicilio el mismo día. ¡Haz de hoy un momento inolvidable! Pide ya.',
         },
         { name: 'theme-color', content: '#FDF5F7' },
       ],
@@ -27,7 +27,7 @@ export default defineNuxtConfig({
   fonts: {
     families: [
       { name: 'Sora', provider: 'google', weights: [500, 600, 700, 800] },
-      { name: 'Plus Jakarta Sans', provider: 'google', weights: [400, 500, 600, 700] },
+      { name: 'Plus Jakarta Sans', provider: 'google', weights: [400, 500, 600, 700, 800] },
     ],
   },
 })

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhArrowRight, PhCoffee, PhHeart, PhConfetti, PhLeaf } from '@phosphor-icons/vue'
+import { PhArrowRight, PhCaretLeft, PhCaretRight, PhCoffee, PhHeart, PhConfetti, PhLeaf, PhGift } from '@phosphor-icons/vue'
 import gsap from 'gsap'
 import { InertiaPlugin } from 'gsap/InertiaPlugin'
 import type { ComponentPublicInstance } from 'vue'
@@ -113,11 +113,15 @@ onMounted(() => {
           if (entry.isIntersecting) tween.resume()
           else tween.pause()
         }
+        if (entry.isIntersecting) startAutoplay()
+        else stopAutoplay()
       },
       { threshold: 0 }
     )
     visibilityObserver.observe(stageEl.value)
   }
+
+  if (!reduceMotion) startAutoplay()
 })
 
 onBeforeUnmount(() => {
@@ -125,7 +129,88 @@ onBeforeUnmount(() => {
   visibilityObserver?.disconnect()
   heroCtx?.revert()
   settleTween?.kill()
+  stopAutoplay()
+  for (const timer of giftRainTimers) clearTimeout(timer)
 })
+
+// Avance automático de slide cada AUTOPLAY_INTERVAL_MS mientras el hero está a la vista y
+// nadie interactúa con él. Se detiene con cualquier interacción (drag, flechas, clic en el
+// nombre de categoría) y se reanuda tras AUTOPLAY_RESUME_DELAY_MS de inactividad.
+const AUTOPLAY_INTERVAL_MS = 5000
+const AUTOPLAY_RESUME_DELAY_MS = 6000
+let autoplayTimer: ReturnType<typeof setInterval> | null = null
+let autoplayResumeTimer: ReturnType<typeof setTimeout> | null = null
+
+function startAutoplay() {
+  if (reduceMotion) return
+  stopAutoplay()
+  autoplayTimer = setInterval(() => {
+    goTo((displayIndex.value + 1) % categories.length)
+  }, AUTOPLAY_INTERVAL_MS)
+}
+
+function stopAutoplay() {
+  if (autoplayTimer) clearInterval(autoplayTimer)
+  autoplayTimer = null
+}
+
+function pauseAutoplayThenResume() {
+  stopAutoplay()
+  if (autoplayResumeTimer) clearTimeout(autoplayResumeTimer)
+  autoplayResumeTimer = setTimeout(startAutoplay, AUTOPLAY_RESUME_DELAY_MS)
+}
+
+// Lluvia de regalos: al pasar el cursor por el CTA "Descubrir" caen iconos de regalo
+// (mezclados con el icono propio de la categoría activa) desde arriba del hero. Cada gota
+// es un elemento efímero con su propia animación CSS; se autoelimina del array al terminar
+// para no acumular nodos en el DOM.
+interface GiftDrop {
+  id: number
+  icon: Component
+  left: number
+  size: number
+  duration: number
+  delay: number
+  drift: number
+  rotate: number
+  color: string
+}
+
+const giftDrops = ref<GiftDrop[]>([])
+let giftDropSeq = 0
+const giftRainTimers: ReturnType<typeof setTimeout>[] = []
+const GIFT_RAIN_COUNT = 16
+const GIFT_RAIN_MIN_DURATION_S = 1.6
+const GIFT_RAIN_MAX_DURATION_S = 2.6
+const GIFT_RAIN_SPAWN_SPREAD_MS = 500
+
+function spawnGiftRain() {
+  if (reduceMotion) return
+  const cat = categories[displayIndex.value]!
+  const icons = [PhGift, decorIcon[cat.art]]
+
+  for (let n = 0; n < GIFT_RAIN_COUNT; n++) {
+    const id = giftDropSeq++
+    const duration = GIFT_RAIN_MIN_DURATION_S + Math.random() * (GIFT_RAIN_MAX_DURATION_S - GIFT_RAIN_MIN_DURATION_S)
+    const delay = Math.random() * (GIFT_RAIN_SPAWN_SPREAD_MS / 1000)
+    const drop: GiftDrop = {
+      id,
+      icon: icons[n % 2]!,
+      left: Math.random() * 100,
+      size: 18 + Math.random() * 16,
+      duration,
+      delay,
+      drift: (Math.random() - 0.5) * 60,
+      rotate: (Math.random() - 0.5) * 140,
+      color: n % 2 === 0 ? cat.ink : cat.bg,
+    }
+    giftDrops.value.push(drop)
+    const timer = setTimeout(() => {
+      giftDrops.value = giftDrops.value.filter((d) => d.id !== id)
+    }, (duration + delay) * 1000 + 60)
+    giftRainTimers.push(timer)
+  }
+}
 
 function clampDrag(raw: number) {
   if (activeIndex.value === 0 && raw > 0) return raw * 0.35
@@ -135,6 +220,7 @@ function clampDrag(raw: number) {
 
 function onPointerDown(e: PointerEvent) {
   if (e.pointerType === 'mouse' && e.button !== 0) return
+  pauseAutoplayThenResume()
   settleTween?.kill()
   settleTween = null
   pointerId = e.pointerId
@@ -380,30 +466,30 @@ function syncTransforms() {
       <article
         v-for="(cat, i) in categories"
         :key="cat.id"
-        class="relative flex-none w-full h-full overflow-hidden snap-center flex items-end justify-start pt-[clamp(90px,14vh,160px)] px-[clamp(20px,6vw,80px)] pb-[clamp(140px,20vh,200px)] max-md:items-end max-md:pb-[clamp(190px,34vh,260px)]"
+        class="relative flex-none w-full h-full overflow-hidden snap-center flex items-end justify-start pt-[clamp(90px,14vh,160px)] px-[clamp(20px,6vw,80px)] pb-[clamp(140px,20vh,200px)] max-md:flex-col max-md:items-center max-md:justify-center max-md:text-center max-md:pb-[clamp(220px,38vh,300px)]"
         :style="{ '--cat-ink': cat.ink }"
       >
         <div
-          class="absolute inset-0 flex items-center justify-center pointer-events-none z-0 will-change-transform"
+          class="absolute inset-0 flex items-center justify-center pointer-events-none z-3 will-change-transform max-md:hidden"
           :ref="(el) => setLayerRef(bgtypeWrapEls, i, el)"
           aria-hidden="true"
         >
           <span
-            class="font-display font-extrabold text-[clamp(3.2rem,08vw,10.5rem)] text-[color-mix(in_srgb,var(--cat-ink)_18%,transparent)] whitespace-pre-line text-center leading-[0.95] ml-[2em] tracking-[-0.02em] select-none"
+            class="font-display font-extrabold text-[clamp(3.2rem,08vw,10.5rem)] text-[color-mix(in_srgb,var(--cat-ink)_38%,transparent)] whitespace-pre-line text-center leading-[0.95] ml-[2em] tracking-[-0.02em] select-none"
           >
-            <span class="hero__bgtype-inner text-start inline-block will-change-transform">{{ cat.heroLabel ?? cat.name }}</span>
+            <span class=" hero__bgtype-inner text-start inline-block will-change-transform">{{ cat.heroLabel ?? cat.name }}</span>
           </span>
         </div>
 
         <div
-          class="relative z-2 w-[clamp(220px,30vw,440px)] aspect-square drop-shadow-[0_30px_40px_rgba(0,0,0,0.15)] will-change-transform"
+          class="relative z-2 w-[clamp(220px,30vw,440px)] aspect-square drop-shadow-[0_30px_40px_rgba(0,0,0,0.15)] will-change-transform max-md:w-[clamp(180px,52vw,260px)] max-md:mx-auto"
           :ref="(el) => setLayerRef(productWrapEls, i, el)"
         >
-          <div class="hero__product-inner w-full h-full will-change-transform">
+          <div class="hero__product-inner w-full h-full will-change-transform mix-blend-difference ">
             <img
               :src="cat.productImage"
               :alt="cat.name"
-              class="w-full h-full object-contain object-bottom block [-webkit-user-drag:none] select-none"
+              class="w-full h-full mix-blend-screen opacity-80 z-0  object-contain object-bottom block [-webkit-user-drag:none] select-none"
               loading="eager"
               decoding="async"
               fetchpriority="high"
@@ -412,6 +498,11 @@ function syncTransforms() {
             />
           </div>
         </div>
+
+        <h2
+          class="hidden max-md:block relative z-2 mt-3 font-display font-extrabold text-[clamp(1.5rem,6.5vw,2.1rem)] leading-[1.05] tracking-[-0.01em] text-center whitespace-pre-line select-none transition-[opacity,transform] duration-500 ease-[ease] text-(--cat-ink)"
+          :class="i === displayIndex ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[10px]'"
+        >{{ cat.heroLabel ?? cat.name }}</h2>
 
         <div
           class="absolute right-[clamp(30px,8vw,120px)] top-[20%] z-1 opacity-85 origin-center will-change-transform text-[color-mix(in_srgb,var(--cat-ink)_55%,transparent)]"
@@ -425,11 +516,11 @@ function syncTransforms() {
 
         <div
           v-if="cat.decorImage"
-          class="absolute left-[clamp(24px,9vw,130px)] top-[clamp(70px,12vh,130px)] z-1 w-[clamp(300px,68vw,150px)] opacity-[0.92] origin-center will-change-transform"
+          class="absolute left-[clamp(24px,9vw,130px)] top-[clamp(70px,12vh,130px)] z-1 w-[clamp(130px,32vw,260px)] opacity-[0.92] origin-center will-change-transform max-md:w-[clamp(100px,38vw,170px)] max-md:top-[clamp(56px,10vh,100px)]"
           :ref="(el) => setLayerRef(decor2WrapEls, i, el)"
           aria-hidden="true"
         >
-          <div class="hero__decor2-inner inline-flex will-change-transform">
+          <div class="hero__decor2-inner inline-flex will-change-transform mix-blend-multiply">
             <img
               :src="cat.decorImage"
               :alt="''"
@@ -443,7 +534,7 @@ function syncTransforms() {
         </div>
 
         <p
-          class="hidden md:block absolute left-[clamp(20px,6vw,80px)] bottom-[clamp(46px,-15vh,140px)] max-w-[30ch] text-xl font-medium z-2 transition-[opacity,transform] duration-500 ease-[ease] text-(--cat-ink)"
+          class="hidden md:block absolute left-[clamp(20px,6vw,80px)] bottom-[clamp(42px,17vh,90px)] max-w-[30ch] text-xl font-medium z-2 transition-[opacity,transform] duration-500 ease-[ease] text-(--cat-ink)"
           :class="i === displayIndex ? 'opacity-[0.92] translate-y-0' : 'opacity-0 translate-y-[10px]'"
         >
           {{ cat.tagline }}
@@ -451,9 +542,36 @@ function syncTransforms() {
       </article>
     </div>
 
+    <button
+      type="button"
+      class="absolute left-[clamp(10px,2.5vw,32px)] top-1/2 -translate-y-1/2 z-3 flex items-center justify-center w-11 h-11 rounded-full bg-(--surface)/85 text-(--ink) shadow-(--shadow-lift) backdrop-blur transition-[opacity,transform] duration-250 ease-[ease] pointer-events-auto hover:-translate-x-0.5 hover:scale-105 disabled:opacity-0 disabled:pointer-events-none"
+      :disabled="displayIndex === 0"
+      aria-label="Categoría anterior"
+      @click="pauseAutoplayThenResume(); goTo(displayIndex - 1)"
+    >
+      <PhCaretLeft :size="22" weight="bold" />
+    </button>
+
+    <button
+      type="button"
+      class="absolute right-[clamp(10px,2.5vw,32px)] top-1/2 -translate-y-1/2 z-3 flex items-center justify-center w-11 h-11 rounded-full bg-(--surface)/85 text-(--ink) shadow-(--shadow-lift) backdrop-blur transition-[opacity,transform] duration-250 ease-[ease] pointer-events-auto hover:translate-x-0.5 hover:scale-105 disabled:opacity-0 disabled:pointer-events-none"
+      :disabled="displayIndex === categories.length - 1"
+      aria-label="Siguiente categoría"
+      @click="pauseAutoplayThenResume(); goTo(displayIndex + 1)"
+    >
+      <PhCaretRight :size="22" weight="bold" />
+    </button>
+
     <div
       class="absolute inset-0 flex items-end justify-between gap-5 px-[clamp(20px,6vw,80px)] pb-[clamp(36px,6vh,56px)] pointer-events-none z-3 max-md:flex-col max-md:items-start max-md:justify-end max-md:gap-[18px]"
     >
+      <p
+        class="hidden max-md:block max-w-[30ch] text-base font-medium text-(--cat-ink)"
+        :style="{ '--cat-ink': categories[displayIndex]!.ink }"
+      >
+        {{ categories[displayIndex]!.tagline }}
+      </p>
+
       <nav
         class="flex flex-wrap gap-[clamp(14px,2.4vw,28px)] pointer-events-auto max-md:gap-x-[18px] max-md:gap-y-3"
         aria-label="Categorías de regalo"
@@ -466,7 +584,7 @@ function syncTransforms() {
           :class="i === displayIndex
             ? 'opacity-100 font-bold text-(--ink) border-b-(--ink)'
             : 'opacity-65 font-semibold text-[color-mix(in_srgb,var(--ink)_55%,transparent)] border-b-transparent'"
-          @click="goTo(i)"
+          @click="pauseAutoplayThenResume(); goTo(i)"
         >
           {{ cat.name }}
         </button>
@@ -475,10 +593,64 @@ function syncTransforms() {
       <a
         class="hero__cta btn pointer-events-auto shrink-0 bg-(--ink) text-(--bg) hover:bg-(--accent-dark) hover:-translate-y-0.5"
         href="#catalogo"
+        @mouseenter="spawnGiftRain"
+        @focus="spawnGiftRain"
       >
         Descubrir
         <PhArrowRight :size="18" weight="bold" />
       </a>
     </div>
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none z-4" aria-hidden="true">
+      <component
+        :is="drop.icon"
+        v-for="drop in giftDrops"
+        :key="drop.id"
+        :size="drop.size"
+        weight="fill"
+        class="hero__gift-drop absolute top-0"
+        :style="{
+          left: `${drop.left}%`,
+          color: drop.color,
+          animationDuration: `${drop.duration}s`,
+          animationDelay: `${drop.delay}s`,
+          '--drop-drift': `${drop.drift}px`,
+          '--drop-rotate': `${drop.rotate}deg`,
+        }"
+      />
+    </div>
   </section>
 </template>
+
+<style scoped>
+.hero__gift-drop {
+  opacity: 0;
+  animation-name: hero-gift-fall;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+
+@keyframes hero-gift-fall {
+  0% {
+    transform: translate(0, -10%) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.95;
+  }
+  85% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(var(--drop-drift), 112vh) rotate(var(--drop-rotate));
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__gift-drop {
+    animation: none;
+    display: none;
+  }
+}
+</style>

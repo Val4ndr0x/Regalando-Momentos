@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { PhList, PhX, PhWhatsappLogo } from '@phosphor-icons/vue'
 import { waLink } from '~/data/site'
+import logoIcon from '~/assets/iconos/icon.png'
 
 const scrolled = ref(false)
 const menuOpen = ref(false)
@@ -20,10 +21,11 @@ onMounted(() => {
 onBeforeUnmount(() => observer?.disconnect())
 
 const links = [
-  { href: '#como-funciona', label: 'Cómo funciona' },
-  { href: '#catalogo', label: 'Catálogo' },
+{ href: '#inicio', label: 'Inicio' },
+  { href: '#regalos', label: 'Regalos' },
+  { href: '#bandejas', label: 'Bandejas de sabores' },
   { href: '#historias', label: 'Historias' },
-  { href: '#suscripcion', label: 'Suscripción' },
+  { href: '#quienes-somos', label: 'Quiénes somos' },
 ]
 
 function closeMenu() {
@@ -38,7 +40,10 @@ function closeMenu() {
     :class="scrolled ? 'bg-[rgba(253,246,248,0.88)] [backdrop-filter:blur(14px)_saturate(160%)] shadow-[0_1px_0_var(--line)]' : ''"
   >
     <div class="container flex items-center justify-between gap-6 h-18">
-      <a href="#top" class="font-display font-extrabold text-lg tracking-[-0.01em] text-(--ink) shrink-0">Regalando Momentos</a>
+      <a href="#top" class="flex items-center gap-2 font-display font-extrabold text-lg tracking-[-0.01em] text-(--ink) shrink-0">
+        <img :src="logoIcon" alt="Regalando Momentos" class="h-16 w-16 shrink-0 mx-4" />
+        <span>Regalando <span class=" text-yellow-700">Momentos</span></span>
+      </a>
 
       <nav class="flex items-center gap-7 text-sm font-semibold flex-1 justify-center max-[860px]:hidden" aria-label="Principal">
         <a

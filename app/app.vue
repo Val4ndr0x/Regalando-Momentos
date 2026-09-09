@@ -5,12 +5,12 @@
     <SiteHeader />
     <main>
       <HeroCarousel />
+      <HappyClients />
       <HowItWorks />
       <TrustStrip />
       <ProductCatalog />
       <GiftQuiz />
-      <Testimonials />
-      <Stories />
+
       <Subscription />
     </main>
     <SiteFooter />
